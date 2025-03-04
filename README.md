@@ -11,41 +11,25 @@ Este proyecto implementa el "Juego de la Vida" de John Conway en Java. El progra
 Instrucciones
 
 
--Generar la Matriz Inicial
+Estructuras de Datos:
 
--Crear una matriz bidimensional de tamaño 10x10.
+Se usará una matriz bidimensional de tamaño 10x10 para representar el tablero del juego.
+Cada celda de la matriz puede contener:
+'*' (célula viva).
+' ' (célula muerta).
+Juego de la Vida:
 
--Llenar cada celda aleatoriamente con:
+Reglas del modelo celular:
+Una célula viva ('*') con menos de 2 o más de 3 vecinos vivos muere.
+Una célula viva ('*') con exactamente 2 o 3 vecinos vivos sobrevive.
+Una célula muerta (' ') con exactamente 3 vecinos vivos revive ('*').
+Prueba de Escritorio:
 
--'*' para celdas vivas.
+Simulación manual del comportamiento en un punto específico:
+Evaluar el estado inicial del punto (0,0) y sus vecinos.
+Aplicar las reglas del modelo celular.
+Registrar el estado final de la celda (0,0) después de una iteración.
 
--' ' para celdas muertas.
-
--Imprimir la matriz inicial en consola.
-
-
-
-Actualizar el estado de cada celda según las siguientes reglas:
-
-
-Una célula viva ('*'):
-
--Muere si tiene menos de 2 o más de 3 vecinos vivos.
-
--Sobrevive si tiene exactamente 2 o 3 vecinos vivos.
-
-
-Una célula muerta (' '):
-
--Revive si tiene exactamente 3 vecinos vivos.
-
-
-Mostrar Resultados
-
--Mostrar en consola:
-
-La matriz inicial.
-La matriz actualizada después de aplicar las reglas.
 
 Realizar una prueba de escritorio detallada para la celda (0,0).
 
@@ -85,30 +69,84 @@ Código
 
 
 
-
-
         
-       //package Taller6;
-        import java.util.Random;
-        public class Juego {
+       //import java.util.Random;
+       
+    public class JuegoDeLaVida {
+
     public static void main(String[] args) {
         int filas = 10, columnas = 10;
         char[][] matriz = new char[filas][columnas];
         Random random = new Random();
 
-        // Actualizar la matriz con reglas simples (sin contar vecinos)
+        // Inicializar la matriz con celdas vivas ('*') y muertas (' ')
         for (int i = 0; i < filas; i++) {
             for (int j = 0; j < columnas; j++) {
-                if (matriz[i][j] == '*') {
-                    matriz[i][j] = ' ';  // Las celdas vivas mueren
-                } else {
-                    matriz[i][j] = '*';  // Las celdas muertas reviven
-                }
+                matriz[i][j] = random.nextBoolean() ? '*' : ' ';
             }
         }
 
-        System.out.println("\nMatriz actualizada:");
+        // Mostrar estado inicial
+        System.out.println("Estado inicial:");
         imprimirMatriz(matriz);
+
+        // Actualizar la matriz usando las reglas del Juego de la Vida
+        char[][] nuevaMatriz = actualizarMatriz(matriz);
+
+        // Mostrar estado posterior
+        System.out.println("\nEstado posterior:");
+        imprimirMatriz(nuevaMatriz);
+    }
+
+    // Actualiza la matriz según las reglas del Juego de la Vida
+    public static char[][] actualizarMatriz(char[][] matriz) {
+        int filas = matriz.length;
+        int columnas = matriz[0].length;
+        char[][] nuevaMatriz = new char[filas][columnas];
+
+        for (int i = 0; i < filas; i++) {
+            for (int j = 0; j < columnas; j++) {
+                int vecinosVivos = contarVecinosVivos(matriz, i, j);
+
+                if (matriz[i][j] == '*') { // Célula viva
+                    if (vecinosVivos < 2 || vecinosVivos > 3) {
+                        nuevaMatriz[i][j] = ' '; // Muere
+                    } else {
+                        nuevaMatriz[i][j] = '*'; // Sobrevive
+                    }
+                } else { // Célula muerta
+                    if (vecinosVivos == 3) {
+                        nuevaMatriz[i][j] = '*'; // Revive
+                    } else {
+                        nuevaMatriz[i][j] = ' '; // Sigue muerta
+                    }
+                }
+            }
+        }
+        return nuevaMatriz;
+    }
+
+    // Cuenta los vecinos vivos de una celda
+    public static int contarVecinosVivos(char[][] matriz, int fila, int columna) {
+        int filas = matriz.length;
+        int columnas = matriz[0].length;
+        int vivos = 0;
+
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                if (i == 0 && j == 0) continue; // Ignorar la celda actual
+                int nuevaFila = fila + i;
+                int nuevaColumna = columna + j;
+
+                // Validar que los índices estén dentro del rango
+                if (nuevaFila >= 0 && nuevaFila < filas && nuevaColumna >= 0 && nuevaColumna < columnas) {
+                    if (matriz[nuevaFila][nuevaColumna] == '*') {
+                        vivos++;
+                    }
+                }
+            }
+        }
+        return vivos;
     }
 
     // Imprimir la matriz
@@ -120,4 +158,6 @@ Código
             System.out.println();
         }
     }
+
+
     }
